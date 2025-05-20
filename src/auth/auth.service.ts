@@ -1,13 +1,10 @@
-import {
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -53,10 +50,7 @@ export class AuthService {
     }
 
     // compare password.
-    const pwMatches = await argon.verify(
-      user.hash,
-      dto.password,
-    );
+    const pwMatches = await argon.verify(user.hash, dto.password);
 
     // if password incorrect throw exception.
     if (!pwMatches) {
